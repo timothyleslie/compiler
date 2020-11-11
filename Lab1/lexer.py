@@ -1,19 +1,32 @@
 digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 alphas = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-          'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+          'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_',
           'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
           'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-keywords = ['auto', 'double', 'int', 'struct', 'break', 'else', 'long', 'switch', 'case', 'enum',
-            'register', 'typedef', 'char', 'extern', 'return', 'union', 'const', 'float', 'short', 'unsigned',
-            'continue', 'for', 'signed', 'void', 'default', 'goto', 'sizeof', 'volatile', 'do', 'if',
-            'while', 'static']
-
-boadwords = [';', ',', '(', ')', '.', '{', '}', '[', ']']
-
+EncodeTable = {'auto': (1, "AUTO"), 'double': (2, "DOUBLE"), 'int': (3, "INT"), 'struct': (4, "STRUCT"),
+               'break': (5, "BREAK"), 'else': (6, "ELSE"), 'long': (7, "LONG"), 'switch': (8, "SWITCH"),
+               'case': (9, "CASE"), 'enum': (10, "ENUM"),
+               'register': (11, "REGISTER"), 'typedef': (12, "TYPEDEF"), 'char': (13, "CHAR"), 'extern': (14, "EXTERN"),
+               'return': (15, "RETURN"), 'union': (16, "UNION"), 'const': (17, "CONST"),
+               'float': (18, "FLOAT"), 'short': (19, "SHORT"), 'unsigned': (20, "UNSIGNED"),
+               'continue': (21, "CONTINUE"), 'for': (22, "FOR"), 'signed': (23, "SIGNED"), 'void': (24, "VOID"),
+               'default': (25, "DEFAULT"), 'goto': (26, "GOTO"), 'sizeof': (27, "SIZEOF"),
+               'volatile': (28, "VOLATILE"), 'do': (29, "DO"), 'if': (30, "IF"),
+               'while': (31, "WHILE"), 'static': (32, "STATIC"), ';': (33, "SEMIC"), ',': (34, "DOT"),
+               '(': (35, "OPEN_PAREN"), ')': (36, "CLOSE_PAREN"), '{': (38, "OPEN_CURLY"), '}': (39, "CLOSE_CURLY"),
+               '[': (40, "OPEN_BRACKET"), ']': (41, "CLOSE_BRACKET"),
+               '+': (42, "PLUS"), '-': (43, "MINUS"), '*': (44, "MULTI"), '/': (45, "DIVIDE"), '!': (46, "NOT"),
+               '|': (47, "OR"), '&': (48, "AND"), '=': (49, "ASSIGN"), '==': (50, "EQUAL"), '<': (51, "LE"),
+               '>': (52, "GE"), '<=': (53, "LEQ"), '>=': (54, "GEQ")}
+ID = (0, "ID")
+INT = (55, "INT_NUM")
+REAL = (56, "REAL_NUM")
+CHAR = (57, "CHAR_CONST")
+STRING = (58, "STRING_CONST")
 current_state = 10
 msg = ""
 buf = ""
-character_table = []
+character_table = {}
 
 
 def generate_states():
@@ -43,7 +56,7 @@ def analysis(ch):
     global msg
     global buf
     global character_table
-    print(ch)
+    # print(ch)
     while True:
         # print(ch)
         # print(current_state)
@@ -113,15 +126,14 @@ def analysis(ch):
                 current_state = States[2]
 
         elif current_state == States[2]:
-            if buf in keywords:
-                msg = msg + '(' + buf.upper() + ', ' + buf + ')\n'
+            if buf in EncodeTable:
+                msg = msg + '(' + str(EncodeTable[buf][1]) + ', ' + buf + ')\n'
                 # print(msg)
 
             else:
-                msg = msg + '(ID, ' + buf + ')\n'
-                if buf not in character_table:
-                    character_table.append(buf)
-                # print(msg)
+                if buf not in character_table.keys():
+                    character_table[buf] = len(character_table)
+                msg = msg + '(' + ID[1] + ', ' + str(character_table[buf]) + ')\n'
 
             buf = ""
             current_state = States[0]
@@ -139,7 +151,7 @@ def analysis(ch):
                 current_state = States[4]
 
         elif current_state == States[4]:
-            msg = msg + '(Int, ' + buf + ')\n'
+            msg = msg + '(' + INT[1] + ', ' + buf + ')\n'
             buf = ""
             current_state = States[0]
 
@@ -152,7 +164,7 @@ def analysis(ch):
                 current_state = States[6]
 
         elif current_state == States[6]:
-            msg = msg + '(Real, ' + buf + ')\n'
+            msg = msg + '(' + REAL[1] + ', ' + buf + ')\n'
             buf = ""
             current_state = States[0]
 
@@ -165,7 +177,7 @@ def analysis(ch):
                 return
 
         elif current_state == States[8]:
-            msg = msg + '(Char ' + buf + ')\n'
+            msg = msg + '(' + CHAR[1] + ', ' + buf + ')\n'
             buf = ""
             current_state = States[0]
             return
@@ -179,98 +191,98 @@ def analysis(ch):
                 return
 
         elif current_state == States[10]:
-            msg = msg + '(String ' + buf + ')\n'
+            msg = msg + '(' + STRING[1] + ', ' + buf + ')\n'
             buf = ""
             current_state = States[0]
             return
 
         # ","
         elif current_state == States[11]:
-            msg = msg + '(DOT, ,)\n'
+            msg = msg + '(' + str(EncodeTable[','][1]) + ', ' + ',' + ')\n'
             current_state = States[0]
             return
 
         # ";"
         elif current_state == States[12]:
-            msg = msg + '(SEMIC, ;)\n'
+            msg = msg + '(' + str(EncodeTable[';'][1]) + ', ' + ';' + ')\n'
             current_state = States[0]
             return
 
         # "("
         elif current_state == States[13]:
-            msg = msg + '(OPEN_PAREN, ()\n'
+            msg = msg + '(' + str(EncodeTable['('][1]) + ', ' + '(' + ')\n'
             current_state = States[0]
             return
 
         # ")"
         elif current_state == States[14]:
-            msg = msg + '(CLOSE_PAREN, ))\n'
+            msg = msg + '(' + str(EncodeTable[')'][1]) + ', ' + ')' + ')\n'
             current_state = States[0]
             return
 
         # "{"
         elif current_state == States[15]:
-            msg = msg + '(OPEN_CURLY, {)\n'
+            msg = msg + '(' + str(EncodeTable['{'][1]) + ', ' + '{' + ')\n'
             current_state = States[0]
             return
 
         # "}"
         elif current_state == States[16]:
-            msg = msg + '(CLOSE_CURLY, })\n'
+            msg = msg + '(' + str(EncodeTable['}'][1]) + ', ' + '}' + ')\n'
             current_state = States[0]
             return
 
         # "["
         elif current_state == States[17]:
-            msg = msg + '(OPEN_BRACKET, [)\n'
+            msg = msg + '(' + str(EncodeTable['['][1]) + ', ' + '[' + ')\n'
             current_state = States[0]
             return
 
         # "]"
         elif current_state == States[18]:
-            msg = msg + '(CLOSE_BRACKET, ])\n'
+            msg = msg + '(' + str(EncodeTable[']'][1]) + ', ' + ']' + ')\n'
             current_state = States[0]
             return
 
         # "+"
         elif current_state == States[19]:
-            msg = msg + '(PLUS, +)\n'
+            msg = msg + '(' + str(EncodeTable['+'][1]) + ', ' + '+' + ')\n'
             current_state = States[0]
             return
 
         # "-"
         elif current_state == States[20]:
-            msg = msg + '(MINUS, -)\n'
+            msg = msg + '(' + str(EncodeTable['-'][1]) + ', ' + '-' + ')\n'
             current_state = States[0]
             return
 
         # "*"
         elif current_state == States[21]:
-            msg = msg + '(MULTI, *)\n'
+            msg = msg + '(' + str(EncodeTable['*'][1]) + ', ' + '*' + ')\n'
             current_state = States[0]
             return
 
         # "/"
         elif current_state == States[22]:
-            msg = msg + '(DIVIDE, /)\n'
+            msg = msg + '(' + str(EncodeTable['/'][1]) + ', ' + '/' + ')\n'
             current_state = States[0]
             return
 
         # "!"
         elif current_state == States[23]:
-            msg = msg + '(NOT, !)\n'
+            msg = msg + '(' + str(EncodeTable['!'][1]) + ', ' + '!' + ')\n'
             current_state = States[0]
             return
 
         # "|"
         elif current_state == States[24]:
-            msg = msg + '(OR, |)\n'
+            msg = msg + '(' + str(EncodeTable['|'][1]) + ', ' + '|' + ')\n'
             current_state = States[0]
             return
 
         # "&"
         elif current_state == States[25]:
-            msg = msg + '(AND, &)\n'
+            msg = msg + '(' + str(EncodeTable['&'][1]) + ', ' + '&' + ')\n'
             current_state = States[0]
             return
 
@@ -297,32 +309,32 @@ def analysis(ch):
 
         #  "=="
         elif current_state == States[29]:
-            msg = msg + '(EQUAL, ==)\n'
+            msg = msg + '(' + str(EncodeTable['=='][1]) + ', ' + '==' + ')\n'
             current_state = States[0]
             return
 
         elif current_state == States[30]:
-            msg = msg + '(ASSIGN, =)\n'
+            msg = msg + '(' + str(EncodeTable['='][1]) + ', ' + '=' + ')\n'
             current_state = States[0]
 
         #  "<="
         elif current_state == States[31]:
-            msg = msg + '(LEQ, <=)\n'
+            msg = msg + '(' + str(EncodeTable['<='][1]) + ', ' + '<=' + ')\n'
             current_state = States[0]
             return
 
         elif current_state == States[32]:
-            msg = msg + '(LE, <)\n'
+            msg = msg + '(' + str(EncodeTable['<'][1]) + ', ' + '<' + ')\n'
             current_state = States[0]
 
         #  ">="
         elif current_state == States[33]:
-            msg = msg + '(GEQ, >=)\n'
+            msg = msg + '(' + str(EncodeTable['>='][1]) + ', ' + '>=' + ')\n'
             current_state = States[0]
             return
 
         elif current_state == States[34]:
-            msg = msg + '(GE, >)\n'
+            msg = msg + '(' + str(EncodeTable['>'][1]) + ', ' + '>' + ')\n'
             current_state = States[0]
 
 
@@ -332,11 +344,14 @@ def scanner(text):
     text_length = len(text)
     for i in range(0, text_length):
         analysis(text[i])
+
     with open('token.txt', 'w') as token_file:
         token_file.write(msg)
     with open('charactertable.txt', 'w') as character_file:
-        for character in character_table:
-            character_file.write(character)
+        for character in character_table.items():
+            character_file.write(str(character[1]))
+            character_file.write(',')
+            character_file.write(character[0])
             character_file.write('\n')
 
 
