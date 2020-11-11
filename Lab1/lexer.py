@@ -18,7 +18,7 @@ character_table = []
 
 def generate_states():
     states = []
-    for i in range(0, 20):
+    for i in range(0, 50):
         states.append(i)
     return states
 
@@ -78,6 +78,29 @@ def analysis(ch):
                 current_state = States[17]
             elif ch == ']':
                 current_state = States[18]
+            elif ch == '+':
+                current_state = States[19]
+            elif ch == '-':
+                current_state = States[20]
+            elif ch == '*':
+                current_state = States[21]
+            elif ch == '/':
+                current_state = States[22]
+            elif ch == '!':
+                current_state = States[23]
+            elif ch == '|':
+                current_state = States[24]
+            elif ch == '&':
+                current_state = States[25]
+            elif ch == '=':
+                current_state = States[26]
+                return
+            elif ch == '<':
+                current_state = States[27]
+                return
+            elif ch == '>':
+                current_state = States[28]
+                return
             else:
                 current_state = States[0]
                 return
@@ -175,7 +198,132 @@ def analysis(ch):
 
         # "("
         elif current_state == States[13]:
-            msg = msg + ''
+            msg = msg + '(OPEN_PAREN, ()\n'
+            current_state = States[0]
+            return
+
+        # ")"
+        elif current_state == States[14]:
+            msg = msg + '(CLOSE_PAREN, ))\n'
+            current_state = States[0]
+            return
+
+        # "{"
+        elif current_state == States[15]:
+            msg = msg + '(OPEN_CURLY, {)\n'
+            current_state = States[0]
+            return
+
+        # "}"
+        elif current_state == States[16]:
+            msg = msg + '(CLOSE_CURLY, })\n'
+            current_state = States[0]
+            return
+
+        # "["
+        elif current_state == States[17]:
+            msg = msg + '(OPEN_BRACKET, [)\n'
+            current_state = States[0]
+            return
+
+        # "]"
+        elif current_state == States[18]:
+            msg = msg + '(CLOSE_BRACKET, ])\n'
+            current_state = States[0]
+            return
+
+        # "+"
+        elif current_state == States[19]:
+            msg = msg + '(PLUS, +)\n'
+            current_state = States[0]
+            return
+
+        # "-"
+        elif current_state == States[20]:
+            msg = msg + '(MINUS, -)\n'
+            current_state = States[0]
+            return
+
+        # "*"
+        elif current_state == States[21]:
+            msg = msg + '(MULTI, *)\n'
+            current_state = States[0]
+            return
+
+        # "/"
+        elif current_state == States[22]:
+            msg = msg + '(DIVIDE, /)\n'
+            current_state = States[0]
+            return
+
+        # "!"
+        elif current_state == States[23]:
+            msg = msg + '(NOT, !)\n'
+            current_state = States[0]
+            return
+
+        # "|"
+        elif current_state == States[24]:
+            msg = msg + '(OR, |)\n'
+            current_state = States[0]
+            return
+
+        # "&"
+        elif current_state == States[25]:
+            msg = msg + '(AND, &)\n'
+            current_state = States[0]
+            return
+
+        # "="
+        elif current_state == States[26]:
+            if ch == '=':
+                current_state = States[29]
+            else:
+                current_state = States[30]
+
+        # "<"
+        elif current_state == States[27]:
+            if ch == '=':
+                current_state = States[31]
+            else:
+                current_state = States[32]
+
+        # ">"
+        elif current_state == States[28]:
+            if ch == '=':
+                current_state = States[33]
+            else:
+                current_state = States[34]
+
+        #  "=="
+        elif current_state == States[29]:
+            msg = msg + '(EQUAL, ==)\n'
+            current_state = States[0]
+            return
+
+        elif current_state == States[30]:
+            msg = msg + '(ASSIGN, =)\n'
+            current_state = States[0]
+
+        #  "<="
+        elif current_state == States[31]:
+            msg = msg + '(LEQ, <=)\n'
+            current_state = States[0]
+            return
+
+        elif current_state == States[32]:
+            msg = msg + '(LE, <)\n'
+            current_state = States[0]
+
+        #  ">="
+        elif current_state == States[33]:
+            msg = msg + '(GEQ, >=)\n'
+            current_state = States[0]
+            return
+
+        elif current_state == States[34]:
+            msg = msg + '(GE, >)\n'
+            current_state = States[0]
 
 
 def scanner(text):
