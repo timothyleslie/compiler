@@ -1,0 +1,5 @@
+0,s
+1,result
+2,ch
+3,String
+4,str
