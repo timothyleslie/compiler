@@ -117,7 +117,7 @@ actions_map[('EOL', 21)] = ('r', 2)
 actions_map[('EOL', 22)] = ('r', 3)
 actions_map[('EOL', 23)] = ('r', 6)
 actions_map[('EOL', 26)] = ('r', 7)
-
+actions_map[('INT', 0)] = ('s', 2)
 
 # -----------------------Goto-----------------------
 goto_map = {}
@@ -186,8 +186,8 @@ if __name__ == '__main__':
     while True:
         current_state = state_stack[-1]
         current_input = input_tokens[0][0]
-        # print(current_state)
-        # print(current_input)
+        print(current_state)
+        print(current_input)
         try:
             next_action = find_action(current_input, current_state)
         except KeyError:
