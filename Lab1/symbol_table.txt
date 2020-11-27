@@ -1,4 +1,4 @@
-0:	s
-1:	result
-2:	ch
-3:	str
+0:	a
+1:	b
+2:	c
+3:	d

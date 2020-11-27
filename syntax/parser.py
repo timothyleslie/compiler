@@ -175,7 +175,6 @@ def write_result(result):
 if __name__ == '__main__':
     fp = open("../lab1/token.txt", 'r')
     fp = fp.read()
-    symTable = {'a': '', 'b': '', 'c': '', 'd': ''}
     input_tokens = parse_input(fp)
     # print(input_tokens)
     state_stack = []
@@ -183,8 +182,6 @@ if __name__ == '__main__':
 
     state_stack.append(0)
     symbol_stack.append(('EOL', '#'))
-    step = 0
-    Actions = ""
     result = []
     while True:
         current_state = state_stack[-1]
@@ -201,7 +198,6 @@ if __name__ == '__main__':
             state_stack.append(int(next_action[1]))
             symbol_stack.append(input_tokens[0])
             input_tokens = input_tokens[1:]
-            Actions += "Shift " + str(next_action[1]) + '\n'
 
         elif 'r' in next_action:
             prod_id = next_action[1]
@@ -223,7 +219,6 @@ if __name__ == '__main__':
             state_stack.append(next_state)
             result_str = left_side + "->" + right_side
             result.append(result_str)
-            Actions += "Reduce" + result_str + '\n'
 
         elif 'a' in next_action:
             print("Accept!")
@@ -234,4 +229,3 @@ if __name__ == '__main__':
             print("Error2")
             exit(-1)
 
-    print(Actions)

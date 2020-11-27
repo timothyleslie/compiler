@@ -379,6 +379,7 @@ def scanner(text):
 
     with open('token.txt', 'w') as token_file:
         token_file.write(msg)
+        token_file.write("(EOL, #)")
     with open('symbol_table.txt', 'w') as character_file:
         for character in symbol_table.items():
             character_file.write(str(character[1]))
