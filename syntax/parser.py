@@ -186,8 +186,8 @@ if __name__ == '__main__':
     while True:
         current_state = state_stack[-1]
         current_input = input_tokens[0][0]
-        print(current_state)
-        print(current_input)
+        # print(current_state)
+        # print(current_input)
         try:
             next_action = find_action(current_input, current_state)
         except KeyError:
