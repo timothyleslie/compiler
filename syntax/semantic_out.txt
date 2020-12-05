@@ -1,0 +1,2 @@
+add,t0,b,c
+assign,a,t0

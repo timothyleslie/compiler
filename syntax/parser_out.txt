@@ -1,1 +1,7 @@
-S'->int ID
+B->ID
+A->B
+S->A
+B->ID
+A->B
+S->S + A
+S'->ID = S

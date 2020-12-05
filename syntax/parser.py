@@ -145,6 +145,24 @@ goto_map[('B', 24)] = 17
 goto_map[('B', 25)] = 17
 goto_map[('B', 27)] = 31
 
+symbols_table = {}
+
+
+def read_symbol_table():
+    with open("../lab1/symbol_table.txt") as st:
+        for line in st:
+            address, symbol, type = line.split(',')
+            symbols_table[symbol] = [type, address]
+
+
+class tmpNums():
+    def __init__(self):
+        self.tmpNum = -1
+
+    def newtmpNum(self):
+        self.tmpNum += 1
+        return 't' + str(self.tmpNum)
+
 
 def parse_input(input_string):
     ret = []
@@ -165,15 +183,68 @@ def find_goto(no_terminal_char, state):
     return goto_map[(no_terminal_char, state)]
 
 
-def write_result(result):
+def write_result(result, semantic_actions):
     with open('parser_out.txt', 'w') as output_file:
         for item in result:
             output_file.write(item)
             output_file.write('\n')
+    # print(semantic_actions)
+    with open('semantic_out.txt', 'w') as f:
+        for item in semantic_actions:
+            f.write(item)
+            f.write('\n')
+
+
+def semantic_aciton(prod, symbols):
+    global semantic_acitons
+    # print('symbols', symbols)
+    # print(symbols_table)
+    if prod == 0:
+        str = ("assign," + symbols[2][1] + ',' + symbols[0][1])
+        ret = ['S\'', symbols[2][1]]
+        semantic_acitons.append(str)
+
+    elif prod == 1:
+        symbols_table[symbols[0][1]][0] = 'int'
+        ret = ['S\'', 'INT']
+    elif prod == 2:
+        newtmp = tmpNums().newtmpNum()
+        str = ("add," + newtmp + "," + symbols[2][1] + ',' + symbols[0][1])
+        semantic_acitons.append(str)
+        ret = ['S', newtmp]
+    elif prod == 3:
+        newtmp = tmpNums().newtmpNum()
+        str = ("sub," + newtmp + "," + symbols[2][1] + ',' + symbols[0][1])
+        semantic_acitons.append(str)
+        ret = ['S', newtmp]
+    elif prod == 4:
+        ret = ['S', symbols[0][1]]
+    elif prod == 5:
+        ret = ['A', symbols[0][1]]
+    elif prod == 6:
+        newtmp = tmpNums().newtmpNum()
+        str = ("mul," + newtmp + "," + symbols[2][1] + ',' + symbols[0][1])
+        semantic_acitons.append(str)
+        ret = ['A', newtmp]
+    elif prod == 7:
+        ret = ['B', symbols[1][1]]
+    elif prod == 8:
+        newtmp = tmpNums().newtmpNum()
+        str = ("assign_const," + newtmp + "," + symbols[0][1] + "," + ' ')
+        semantic_acitons.append(str)
+        ret = ['B', newtmp]
+    elif prod == 9:
+        ret = ['B', symbols[0][1]]
+    else:
+        print("Error!!")
+        return
+    # print(semantic_acitons)
+    return ret
 
 
 if __name__ == '__main__':
     fp = open("../lab1/token.txt", 'r')
+    read_symbol_table()
     fp = fp.read()
     input_tokens = parse_input(fp)
     # print(input_tokens)
@@ -181,11 +252,13 @@ if __name__ == '__main__':
     symbol_stack = []
 
     state_stack.append(0)
-    symbol_stack.append(('EOL', '#'))
+    symbol_stack.append(('EOL', '#', 'None'))
+    semantic_acitons = []
     result = []
     while True:
         current_state = state_stack[-1]
         current_input = input_tokens[0][0]
+        poped_symbols = []
         # print(current_state)
         # print(current_input)
         try:
@@ -203,13 +276,14 @@ if __name__ == '__main__':
             prod_id = next_action[1]
             left_side = prod[prod_id][0]
             right_side = prod[prod_id][1]
-
             right_side_len = len(right_side.split(' '))
             for i in range(right_side_len):
-                symbol_stack.pop()
+                poped_symbols.append(symbol_stack.pop())
                 state_stack.pop()
 
-            symbol_stack.append(left_side)
+            # print('popsymbol: ', poped_symbols)
+            left_string = semantic_aciton(prod_id, poped_symbols)
+            symbol_stack.append(left_string)
 
             try:
                 next_state = find_goto(left_side, state_stack[-1])
@@ -222,7 +296,7 @@ if __name__ == '__main__':
 
         elif 'a' in next_action:
             print("Accept!")
-            write_result(result)
+            write_result(result, semantic_acitons)
             break
 
         else:
