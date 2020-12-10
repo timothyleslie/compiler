@@ -146,22 +146,22 @@ goto_map[('B', 25)] = 17
 goto_map[('B', 27)] = 31
 
 symbols_table = {}
+semantic_acitons = []
+tmpNum = -1
+
+
+def newtmpNum():
+    global tmpNum
+    tmpNum = tmpNum + 1
+    return 't' + str(tmpNum)
 
 
 def read_symbol_table():
-    with open("../lab1/symbol_table.txt") as st:
+    with open("./data/symbol_table.txt") as st:
         for line in st:
+            line = line[:-1]
             address, symbol, type = line.split(',')
             symbols_table[symbol] = [type, address]
-
-
-class tmpNums():
-    def __init__(self):
-        self.tmpNum = -1
-
-    def newtmpNum(self):
-        self.tmpNum += 1
-        return 't' + str(self.tmpNum)
 
 
 def parse_input(input_string):
@@ -183,20 +183,30 @@ def find_goto(no_terminal_char, state):
     return goto_map[(no_terminal_char, state)]
 
 
-def write_result(result, semantic_actions):
-    with open('parser_out.txt', 'w') as output_file:
+def write_result(result, semantic_actions, symbol_table):
+    with open('./data/parser_out.txt', 'w') as output_file:
         for item in result:
             output_file.write(item)
             output_file.write('\n')
     # print(semantic_actions)
-    with open('semantic_out.txt', 'w') as f:
+    with open('./data/semantic_out.txt', 'w') as f:
         for item in semantic_actions:
             f.write(item)
             f.write('\n')
 
+    with open('./data/symbol_table.txt', 'w') as sf:
+        for item in symbols_table.items():
+            # print(item)
+            sf.write(item[0])
+            sf.write(',')
+            sf.write(item[1][0])
+            sf.write(',')
+            sf.write(item[1][1])
+            sf.write('\n')
+
 
 def semantic_aciton(prod, symbols):
-    global semantic_acitons
+    # global semantic_acitons
     # print('symbols', symbols)
     # print(symbols_table)
     if prod == 0:
@@ -206,14 +216,15 @@ def semantic_aciton(prod, symbols):
 
     elif prod == 1:
         symbols_table[symbols[0][1]][0] = 'int'
+        # print(symbols_table)
         ret = ['S\'', 'INT']
     elif prod == 2:
-        newtmp = tmpNums().newtmpNum()
+        newtmp = newtmpNum()
         str = ("add," + newtmp + "," + symbols[2][1] + ',' + symbols[0][1])
         semantic_acitons.append(str)
         ret = ['S', newtmp]
     elif prod == 3:
-        newtmp = tmpNums().newtmpNum()
+        newtmp = newtmpNum()
         str = ("sub," + newtmp + "," + symbols[2][1] + ',' + symbols[0][1])
         semantic_acitons.append(str)
         ret = ['S', newtmp]
@@ -222,14 +233,14 @@ def semantic_aciton(prod, symbols):
     elif prod == 5:
         ret = ['A', symbols[0][1]]
     elif prod == 6:
-        newtmp = tmpNums().newtmpNum()
+        newtmp = newtmpNum()
         str = ("mul," + newtmp + "," + symbols[2][1] + ',' + symbols[0][1])
         semantic_acitons.append(str)
         ret = ['A', newtmp]
     elif prod == 7:
         ret = ['B', symbols[1][1]]
     elif prod == 8:
-        newtmp = tmpNums().newtmpNum()
+        newtmp = newtmpNum()
         str = ("assign_const," + newtmp + "," + symbols[0][1] + "," + ' ')
         semantic_acitons.append(str)
         ret = ['B', newtmp]
@@ -242,8 +253,8 @@ def semantic_aciton(prod, symbols):
     return ret
 
 
-if __name__ == '__main__':
-    fp = open("../lab1/token.txt", 'r')
+def main():
+    fp = open("./data/token.txt", 'r')
     read_symbol_table()
     fp = fp.read()
     input_tokens = parse_input(fp)
@@ -253,7 +264,7 @@ if __name__ == '__main__':
 
     state_stack.append(0)
     symbol_stack.append(('EOL', '#', 'None'))
-    semantic_acitons = []
+    # semantic_acitons = []
     result = []
     while True:
         current_state = state_stack[-1]
@@ -295,11 +306,14 @@ if __name__ == '__main__':
             result.append(result_str)
 
         elif 'a' in next_action:
-            print("Accept!")
-            write_result(result, semantic_acitons)
+            # print("Accept!")
+            write_result(result, semantic_acitons, symbols_table)
             break
 
         else:
             print("Error2")
             exit(-1)
 
+
+if __name__ == '__main__':
+    main()

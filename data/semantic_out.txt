@@ -1,0 +1,6 @@
+add,t0,a,b
+sub,t1,a,c
+add,t2,t0,t1
+sub,t3,a,c
+add,t4,t2,t3
+assign,d,t4

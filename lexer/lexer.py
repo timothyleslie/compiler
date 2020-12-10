@@ -28,7 +28,8 @@ current_state = 10
 msg = ""
 buf = ""
 symbol_table = {}
-
+INT_LEN = 4
+REAL_LEN = 8
 
 def generate_states():
     states = []
@@ -136,8 +137,8 @@ def analysis(ch):
 
             else:
                 if buf not in symbol_table.keys():
-                    symbol_table[buf] = len(symbol_table)
-                msg = msg + '(' + ID[1] + ', ' + str(symbol_table[buf]) + ')\n'
+                    symbol_table[buf] = len(symbol_table)*INT_LEN
+                msg = msg + '(' + ID[1] + ', ' + buf + ')\n'
 
             buf = ""
             current_state = States[0]
@@ -377,14 +378,16 @@ def scanner(text):
     for i in range(0, text_length):
         analysis(text[i])
 
-    with open('token.txt', 'w') as token_file:
+    with open('./data/token.txt', 'w') as token_file:
         token_file.write(msg)
         token_file.write("(EOL, #)")
-    with open('symbol_table.txt', 'w') as character_file:
+    with open('./data/symbol_table.txt', 'w') as character_file:
         for character in symbol_table.items():
             character_file.write(str(character[1]))
-            character_file.write(':\t')
-            character_file.write(character[0])
+            character_file.write(',')
+            character_file.write(str(character[0]))
+            character_file.write(',')
+            character_file.write('None')
             character_file.write('\n')
 
 
@@ -393,7 +396,8 @@ def main():
     global current_state
     States = generate_states()
     current_state = States[0]
-    fp = open('test.c', 'r')
+
+    fp = open('./data/src_code', 'r')
     fp = fp.read()
     scanner(fp)
 
